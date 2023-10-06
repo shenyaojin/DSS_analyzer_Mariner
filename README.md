@@ -1,2 +1,5 @@
-# DSS_analyzer_Marina
-The Distributed Strain Sensing tools made for Marina Project (Exxonmobil)
+# DSS analysis Python lib
+
+Based on JIN's pylib, modified for Marina project's format.
+
+Sponsor: ExxonMobil. 
