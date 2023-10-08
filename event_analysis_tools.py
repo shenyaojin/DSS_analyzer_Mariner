@@ -35,3 +35,26 @@ def event_group_generator(stage, depth):
         group_index = group_index + array_len
     return depth_group
 
+def cross_correlation(a, b):
+    """
+    Compute the cross-correlation of sequences a and b.
+
+    Parameters:
+    a (numpy.ndarray): First input sequence.
+    b (numpy.ndarray): Second input sequence.
+
+    Returns:
+    numpy.ndarray: Cross-correlation of sequences a and b.
+    """
+    # Ensure both sequences are 1D
+    a = np.asarray(a).ravel()
+    b = np.asarray(b).ravel()
+
+    # Length of the output sequence
+    out_len = len(a) + len(b) - 1
+
+    # Perform cross-correlation using FFT
+    fft_result = np.fft.fft(a, out_len) * np.fft.fft(b[::-1], out_len)
+    corr_result = np.fft.ifft(fft_result)
+
+    return corr_result
