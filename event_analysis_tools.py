@@ -46,6 +46,7 @@ def cross_correlation(a, b):
     Returns:
     numpy.ndarray: Cross-correlation of sequences a and b.
     """
+    # or just use np.correlate(a, b, mode = 'full')
     # Ensure both sequences are 1D
     a = np.asarray(a).ravel()
     b = np.asarray(b).ravel()
