@@ -367,6 +367,8 @@ class Data2D():
                     continue
                 if k == 'attrs':
                     continue
+                if k == 'datetimestamp':
+                    continue
                 try:
                     f.create_dataset(k,data=self.__dict__[k])
                 except:
