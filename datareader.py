@@ -9,7 +9,7 @@ def gauge_data_marina_reader(gauge_data_path):
     datetime_stamp =  [datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S') for time_str in data['datetime']]
     return data, datetime_stamp
 
-def rfs_data_marina_reader(filepath):
+def rfs_data_marina_reader_from_h5(filepath):
     DSSdata = Data2D_XT_DSS.Data2D()
     DSSdata.loadh5(filepath)
     return DSSdata
@@ -20,3 +20,8 @@ def event_marina_reader(filepath):
     df = pd.read_excel(filepath, engine='openpyxl', usecols="H:H", skiprows=2)
     depth = np.array(df.values).ravel()
     return stage, depth
+
+def dss_data_from_npz(filepath):
+    DSSdata = Data2D_XT_DSS.Data2D()
+    DSSdata = DSSdata.loadnpz(filepath)
+    return DSSdata

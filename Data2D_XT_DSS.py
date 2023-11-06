@@ -10,6 +10,7 @@ from dateutil.parser import parse
 from copy import copy
 import h5py
 import copy
+import pickle
 
 class Data2D():
 
@@ -351,7 +352,8 @@ class Data2D():
         write(filename, rate, scaled)
         return scaled
     
-    def saveh5(self,filename):
+    def saveh5(self,filename): # this method is abandoned for it's incompatible with loadh5 method.
+        # if you want to save to file, pls use savenpz method, and loadnpz method.
         with h5py.File(filename,'w') as f:
             # save main dataset
             dset = f.create_dataset('data',data=self.data)
@@ -374,8 +376,18 @@ class Data2D():
                 except:
                     print('cannot save variable: ',k)
 
+    def savenpz(self, filename):
+        serialized_file = pickle.dumps(self)
+        np_serialized_a = np.array([serialized_file], dtype=np.void)
+        np.savez(filename, data=np_serialized_a)
 
-    def loadh5(self,filename): # modified for Marina dataset
+    def loadnpz(self, filename):
+        loaded_data = np.load(filename)
+        serialized_a = loaded_data['data'][0]
+        a = pickle.loads(serialized_a.tobytes())
+        return a
+
+    def loadh5(self,filename): # modified for Marina dataset, this I/O is only for Marina project
         f = h5py.File(filename,'r')
         # read start_time
         self.start_time = datetime.strptime(f['data'].attrs['StartDateTime'].decode('utf-8'),'%m/%d/%Y %H:%M:%S.%f')
