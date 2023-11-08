@@ -270,3 +270,22 @@ def datetime_interp(timex,timex0,y0):
     
 def running_average(data,N):
     return np.convolve(data,np.ones((N,))/N,mode='same')
+
+def correlation_coefficient(a, n):
+    # calculate the Pearson coorelation coeeficient & dependence: numpy
+    # a, n are different discrete time sequences
+    # using full loop
+    if len(a) != len(n):
+        print("The length is wrong!")
+        return;
+    else:
+        length = len(a)
+        mean_a = np.mean(a)
+        mean_n = np.mean(n)
+        term1, term2, term3 = 0, 0, 0
+        for i in range(length):
+            term1 += (a[i] - mean_a) * (n[i] - mean_n)
+            term2 += (a[i] - mean_a) * (a[i] - mean_a)
+            term3 += (n[i] - mean_n) * (n[i] - mean_n)
+        r = term1 / np.sqrt(term2 * term3)
+        return r

@@ -3,7 +3,7 @@ import pandas as pd
 from . import Data2D_XT_DSS
 from datetime import datetime
 
-def gauge_data_marina_reader(gauge_data_path): 
+def gauge_data_marina_reader_from_csv(gauge_data_path):
     data = pd.read_csv(gauge_data_path)
     # data.columns
     datetime_stamp =  [datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S') for time_str in data['datetime']]
