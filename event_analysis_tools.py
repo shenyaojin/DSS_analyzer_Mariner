@@ -1,6 +1,6 @@
 import numpy as np 
 import pandas as pd
-from . import Data2D_XT_DSS
+from . import Data2D_XT_DSS, gjsignal
 from datetime import datetime
 
 def group_elements(arr):
@@ -63,6 +63,7 @@ def cross_correlation(a, b):
 import numpy as np
 
 def slippage_removal(trc, detect_thres=3, data_point_removal=4, sm_N=2, abs_thres=False, local_std_N=500, is_interp=True):
+    # this code is not tested yet. Please refer to jinwar/JIN_pylib
     # Calculate strain rate
     trc_diff = np.diff(trc)
 
@@ -115,4 +116,62 @@ def slippage_removal(trc, detect_thres=3, data_point_removal=4, sm_N=2, abs_thre
 
     # Change back to strain change
     trc_cor = np.concatenate(([trc[0]], trc[0] + np.cumsum(trc_diff)))
+    return trc_cor
+
+def slippage_removal_lpfilter(trc,detect_thres=3,data_point_removal=4
+        ,sm_N=2,abs_thres=False,local_std_N=500,is_interp=True, 
+        dt = 1, freqcut = 1/100):
+    trc_lp = gjsignal.lpfilter(trc, dt, freqcut)
+    # calculate strain rate
+    trc_diff = np.diff(trc_lp)
+    # detect slippage events
+    if abs_thres:
+        ind = np.abs(trc_diff)>detect_thres
+    else:
+        ind = np.abs(trc_diff)>detect_thres*np.std(trc_diff)
+    ind = np.where(ind)[0]
+    # a higher limitation 
+    if len(ind)>len(trc_lp)*0.5:
+        return trc
+    
+    # for each slippage, check local variance again
+    if not abs_thres:
+        ind_to_remove = []
+        for i in range(len(ind)-1):
+            bgind = np.max((0,ind[i]-local_std_N//2))
+            edind = np.min((ind[i]+local_std_N//2,len(trc_diff)))
+
+            local_std = np.std(trc_diff[bgind:edind])
+            if np.abs(trc_diff[ind[i]]) < detect_thres*local_std:
+                ind_to_remove.append(i)
+        
+        ind = np.delete(ind,ind_to_remove)
+
+    
+    # remove data points after slippage events
+    new_ind = []
+    for i in ind:
+        for j in range(0,data_point_removal):
+            if i+j < len(trc_diff)-1:
+                new_ind.append(i+j)
+            
+    if len(new_ind) == 0 :
+        return trc
+        
+    # perform interpolation
+    good_ind = np.abs(trc_diff)>-1
+    good_ind[new_ind] = False
+    x = np.arange(len(trc_diff))
+    # update trc diff to original signal: 
+    trc_diff = np.diff(trc)
+    good_trc_diff = trc_diff[good_ind].copy()
+    good_trc_diff = np.convolve(good_trc_diff,np.ones(sm_N)/sm_N,'same')
+    if is_interp:
+        # this line -> problem
+        trc_diff[~good_ind] = np.interp(x[~good_ind],x[good_ind],good_trc_diff)
+    else:
+        trc_diff[~good_ind] = 0
+    # change back to strain change
+    trc_cor = np.cumsum(trc_diff)
+    trc_cor = np.concatenate(([0],trc_cor))
     return trc_cor

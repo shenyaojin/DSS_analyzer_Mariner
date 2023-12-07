@@ -343,6 +343,11 @@ class Data2D():
         output_time = self.start_time + timedelta(seconds=self.taxis[ind])
         return output_time,self.data[:,ind]
     
+    def get_value_by_time(self,t):
+        ind = np.argmin(np.abs(self.taxis-t))
+        actual_t = self.taxis[ind]
+        return actual_t,self.data[:,ind]
+    
     def make_audio_file(self,filename,bgdp=None,eddp=None):
         from scipy.io.wavfile import write
         DASdata = self.select_depth(bgdp,eddp,makecopy=True)
