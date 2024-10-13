@@ -1,0 +1,93 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
+import pandas as pd
+import os
+
+# define an object to store the data
+class Data1D_GAUGE:
+    """
+    A class to represent 1D gauge data.
+
+    Attributes:
+    ----------
+    filename : str
+        The name of the file containing the data.
+    data : numpy.ndarray
+        The gauge data values.
+    taxis : numpy.ndarray
+        The datetime values corresponding to the data.
+    """
+
+    # constructor
+    def __init__(self, filename):
+        """
+        Initialize the Data1D_GAUGE object by loading data from my npz file.
+
+        Parameters:
+        ----------
+        filename : str
+            The path to the file containing the data.
+        """
+        file_name = os.path.basename(filename)
+        self.filename = file_name
+        data_structure = np.load(filename, allow_pickle=True)
+        self.data = data_structure['value']
+        self.taxis = data_structure['datetime']
+
+    def crop(self, start, end):
+        """
+        Crop the data to a specific time range.
+
+        Parameters:
+        ----------
+        start : datetime
+            The start time for cropping.
+        end : datetime
+            The end time for cropping.
+        """
+        ind = (self.taxis >= start) & (self.taxis <= end)
+        self.data = self.data[ind]
+        self.taxis = self.taxis[ind]
+
+    def shift(self, shift):
+        """
+        Apply a time shift to the data.
+
+        Parameters:
+        ----------
+        shift : timedelta
+            The time shift to apply.
+        """
+        self.taxis = self.taxis + shift
+
+    def plot(self):
+        """
+        Plot the gauge data.
+        """
+        plt.figure()
+        plt.plot(self.taxis, self.data)
+        # set xtick rotation
+        plt.xticks(rotation=30)
+        plt.title("Gauge data: " + self.filename)
+        plt.xlabel("Time")
+        plt.ylabel("Pressure (psi)")
+        plt.tight_layout()
+        plt.show()
+
+    def print_info(self):
+        """
+        Print information about the gauge data.
+        """
+        print("Gauge data: " + self.filename)
+        print("Number of data points: " + str(len(self.data)))
+        print("Time range: " + str(self.taxis[0]) + " - " + str(self.taxis[-1]))
+
+    def copy(self):
+        """
+        Return a copy of the Data1D_GAUGE object.
+        """
+        new_data = Data1D_GAUGE(self.filename)
+        new_data.data = self.data.copy()
+        new_data.taxis = self.taxis.copy()
+        return new_data
