@@ -128,6 +128,21 @@ class Data1D_PumpingCurve:
         var_index = np.where(self.label == key)[0][0]
         return self.data[var_index, :]
     
+    def crop_data(self, start_time, end_time):
+        """
+        Crop the data to a specific time range.
+
+        Parameters:
+        ----------
+        start_time : datetime
+            The start time of the time range.
+        end_time : datetime
+            The end time of the time range.
+        """
+        ind = (self.taxis >= start_time) & (self.taxis <= end_time)
+        self.data = self.data[:, ind]
+        self.taxis = self.taxis[ind]
+
     def plot_all_vars_simple(self, figsize=(10, 6)):
         """
         Plot the data of all variables.
