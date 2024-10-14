@@ -60,8 +60,6 @@ def cross_correlation(a, b):
 
     return corr_result
 
-import numpy as np
-
 def slippage_removal(trc, detect_thres=3, data_point_removal=4, sm_N=2, abs_thres=False, local_std_N=500, is_interp=True):
     # this code is not tested yet. Please refer to jinwar/JIN_pylib
     # Calculate strain rate

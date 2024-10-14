@@ -61,7 +61,7 @@ class Data1D_GAUGE:
         """
         self.taxis = self.taxis + shift
 
-    def plot(self):
+    def plot_simple(self):
         """
         Plot the gauge data.
         """
@@ -91,3 +91,46 @@ class Data1D_GAUGE:
         new_data.data = self.data.copy()
         new_data.taxis = self.taxis.copy()
         return new_data
+
+    def get_start_time(self):
+        """
+        Return the start time of the data.
+        """
+        return self.taxis[0]
+    
+    def get_end_time(self):
+        """
+        Return the end time of the data.
+        """
+        return self.taxis[-1]
+    
+    def plot(self, ax): 
+        """
+        Plot the gauge data on a given axis.
+
+        Parameters:
+        ----------
+        ax : matplotlib.axes.Axes
+            The axis on which to plot the data.
+        """
+        ax.plot(self.taxis, self.data)
+        ax.set_title("Gauge data: " + self.filename)
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Pressure (psi)")
+        ax.tick_params(axis='x', rotation=30)
+        # legend
+        ax.legend([self.filename], loc='upper right')
+
+    def export(self, filename):
+        """
+        Export the gauge data to a CSV file.
+
+        Parameters:
+        ----------
+        filename : str
+            The name of the file to export the data to.
+        
+        WARNING: UNDER TESTING. NOT SURE IF IT WORKS.
+        """
+        df = pd.DataFrame({'datetime': self.taxis, 'value': self.data})
+        df.to_csv(filename, index=False)
