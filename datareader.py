@@ -3,6 +3,9 @@ import pandas as pd
 from . import Data2D_XT_DSS
 from datetime import datetime
 
+# This library is IO interacting with the original data as a temporary solution.
+# Once I develop the data reader for packed .npz files, I will abandon this library.
+
 def gauge_data_marina_reader_from_csv(gauge_data_path):
     data = pd.read_csv(gauge_data_path)
     # data.columns
