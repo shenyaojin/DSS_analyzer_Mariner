@@ -12,6 +12,7 @@ import h5py
 import copy
 import pickle
 
+# Basically is a modified version based on my own habit. ???????
 class Data2D():
 
     def __init__(self):
@@ -20,29 +21,12 @@ class Data2D():
         self.taxis = []  # time axis in second from start_time
         self.chans = [] # fiber channel number
         self.daxis = []  # fiber physical distance or location
-        self.attrs = {'Python Class Version':'1.1'} # data attributes
-        self.history = []
-        self.datetimestamp = [] # time stamp in date time 
 
     def set_data(self,data):
         self.data = data
 
-    def rotate_data(self): # it's necessary for DSSdata
+    def rotate_data(self): 
         self.data = self.data.T
-    
-    # set mds linked to daxis to be compabible to old versions
-    @property
-    def mds(self):
-        return self.daxis
-
-    @mds.setter
-    def mds(self, mds):
-        self.daxis = mds
-    
-    def set_time_from_datetime(self,timestamps):
-        self.start_time = timestamps[0]
-        self.taxis = np.array([(t-timestamps[0]).total_seconds()
-             for t in timestamps])
     
     def apply_timeshift(self,ts):
         self.start_time += timedelta(hours=ts)
@@ -208,9 +192,8 @@ class Data2D():
         self.data = strain_data
         self.daxis = (self.daxis[gauge_chan_num:]+self.daxis[:-gauge_chan_num])/2
         self.history.append(f'apply_gauge_length(gauge_chan_num={gauge_chan_num})')
-
     
-    def cumsum(self,axis=1):
+    def cumsum(self,axis=1): # to get the strain change of the data.
         data = np.cumsum(self.data,axis=axis)
         if axis==1:
             ds = np.diff(self.taxis)
