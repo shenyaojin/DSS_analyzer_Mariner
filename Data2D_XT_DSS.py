@@ -11,6 +11,7 @@ from copy import copy
 import h5py
 import copy
 import pickle
+from matplotlib.ticker import MaxNLocator
 
 # Basically is a modified version based on my own habit. ???????
 class Data2D():
@@ -21,6 +22,7 @@ class Data2D():
         self.taxis = []  # time axis in second from start_time
         self.chans = [] # fiber channel number
         self.daxis = []  # fiber physical distance or location
+        self.mds = []  # fiber physical distance or location. I don't know why I have two of them. :)
 
     def set_data(self,data):
         self.data = data
@@ -31,11 +33,21 @@ class Data2D():
     def apply_timeshift(self,ts):
         self.start_time += timedelta(hours=ts)
     
+    # Time stamp stuff
+    def set_datetimestamp(self, timestamp): 
+        # time stamp must be a datetime array
+        timestamp = np.array(timestamp)
+        self.datetimestamp = timestamp
+
     def cal_timestamp_from_taxis(self):
         timestamps = [self.start_time + timedelta(seconds=t) 
             for t in self.taxis]
         self.timestamps = timestamps
     
+    def print_timestamp(self):
+        self.cal_timestamp_from_taxis()
+        return self.timestamps
+
     def set_mds(self,mds):
         self.mds = mds
     
@@ -250,6 +262,23 @@ class Data2D():
             plt.gca().xaxis.set_major_locator(plt.MaxNLocator(xtickN))
             plt.xticks(rotation=xaxis_rotation)
 
+    # add a function to enable co plot with other data. return the handle of the plot
+    def plot_water_on_ax(self, ax, ischan=False, cmap=plt.get_cmap('bwr'),
+                     timescale='second', use_timestamp=False, downsample=[1, 1],
+                     xaxis_rotation=0, xtickN=4, timefmt='%m/%d\n%H:%M:%S.{ms}',
+                     timefmt_ms_precision=1):
+        '''
+        timescale options: 'second', 'hour', 'day'
+        '''
+        extent = self.get_extent(ischan=ischan, timescale=timescale, use_timestamp=use_timestamp)
+        img = ax.imshow(self.data[::downsample[0], ::downsample[1]],
+                cmap=cmap, aspect='auto', extent=extent)
+        if use_timestamp:
+            ax.xaxis_date()
+            ax.xaxis.set_major_locator(MaxNLocator(xtickN))
+            ax.tick_params(axis='x', labelrotation=xaxis_rotation)
+        return img        
+    
     def plot_wiggle(self,scale=1,trace_step = 1,linewidth=1):
         # Extract the data, time axis, and distance axis from the seismic_data object
         data = self.data
@@ -340,30 +369,9 @@ class Data2D():
         write(filename, rate, scaled)
         return scaled
     
-    def saveh5(self,filename): # this method is abandoned for it's incompatible with loadh5 method.
-        # if you want to save to file, pls use savenpz method, and loadnpz method.
-        with h5py.File(filename,'w') as f:
-            # save main dataset
-            dset = f.create_dataset('data',data=self.data)
-            # save all the attributes to the main dataset
-            dset.attrs['start time'] = self.start_time.strftime('%Y%m%d_%H%M%S.%f')
-            for k in self.attrs.keys():
-                dset.attrs[k] = self.attrs[k]
-            # save all other ndarray and lists in the class
-            for k in self.__dict__.keys():
-                if k == 'data':
-                    continue
-                if k == 'start_time':
-                    continue
-                if k == 'attrs':
-                    continue
-                if k == 'datetimestamp':
-                    continue
-                try:
-                    f.create_dataset(k,data=self.__dict__[k])
-                except:
-                    print('cannot save variable: ',k)
+    # I/O functions: with npz and other data2D objects
 
+    # ONLY USE THIS FOR PACKING DATA!
     def savenpz(self, filename):
         serialized_file = pickle.dumps(self)
         np_serialized_a = np.array([serialized_file], dtype=np.void)
@@ -372,37 +380,8 @@ class Data2D():
     def loadnpz(self, filename):
         loaded_data = np.load(filename)
         serialized_a = loaded_data['data'][0]
-        a = pickle.loads(serialized_a.tobytes())
-        return a
-
-    def loadh5(self,filename): # modified for Marina dataset, this I/O is only for Marina project
-        f = h5py.File(filename,'r')
-        # read start_time
-        self.start_time = datetime.strptime(f['data'].attrs['StartDateTime'].decode('utf-8'),'%m/%d/%Y %H:%M:%S.%f')
-        # read attributes
-        self.attrs = {}
-        for k in f['data'].attrs.keys():
-            if k == 'StartDateTime':
-                continue
-            self.attrs[k] = f['data'].attrs[k]
-        # read all other ndarrays
-        for k in f.keys():
-            setattr(self,k,np.array(f[k]))
-        f.close()
-        self.history = list(self.history)
-        self.rotate_data()
-        # Add time, location info
-        datetime_timestamp = []
-        for iter in range(len(self.stamps_unix)):
-            datetime_timestamp.append(datetime.strptime(self.stamps[iter].decode('utf-8'),'%m/%d/%Y %H:%M:%S.%f'))
-        self.set_time_from_datetime(datetime_timestamp) # set taxis
-        self.set_datetimestamp(timestamp = datetime_timestamp) # set timestamp
-        self.daxis = self.depth
-
-    def set_datetimestamp(self, timestamp): 
-        # time stamp must be a datetime array
-        timestamp = np.array(timestamp)
-        self.datetimestamp = timestamp
+        new_instance = pickle.loads(serialized_a.tobytes())
+        self.__dict__.update(new_instance.__dict__)
 
     def right_merge(self,data):
         taxis = data.taxis + (data.start_time - self.start_time).total_seconds()
@@ -431,21 +410,3 @@ def merge_data2D(data_list):
     merge_data.data = np.concatenate([d.data.T for d in data_list]).T
     merge_data.taxis = np.concatenate(taxis_list)
     return merge_data
-
-def load_h5(file):
-    data = Data2D()
-    data.loadh5(file)
-    return data
-
-def Patch_to_Data2D(dascore_data):
-    data = dascore_data
-    DASdata = Data2D()
-    axis = data.dims.index('distance')
-    if axis == 1:
-        DASdata.data = data.data.T
-    else:
-        DASdata.data = data.data
-    DASdata.daxis = data.coords['distance']
-    DASdata.start_time = pd.to_datetime(data.coords['time'][0])
-    DASdata.taxis = (data.coords['time']-data.coords['time'][0])/np.timedelta64(1,'s')
-    return DASdata
