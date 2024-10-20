@@ -22,7 +22,7 @@ class Data2D():
         self.taxis = []  # time axis in second from start_time
         self.chans = [] # fiber channel number
         self.daxis = []  # fiber physical distance or location
-        self.mds = []  # fiber physical distance or location. I don't know why I have two of them. :)
+        self.mds = []  # fiber physical distance or location. It is the original data from the fiber, and try not to change it.
 
     def set_data(self,data):
         self.data = data
@@ -100,6 +100,7 @@ class Data2D():
             out_data.data = out_data.data[ind,:]
             try:
                 out_data.daxis =out_data.daxis[ind]
+                out_data.mds =out_data.mds[ind]
             except: 
                 pass
             try:
@@ -112,6 +113,7 @@ class Data2D():
             self.data = self.data[ind,:]
             try:
                 self.daxis =self.daxis[ind]
+                self.mds =self.mds[ind]
             except: 
                 pass
             try:
@@ -233,7 +235,7 @@ class Data2D():
         if ischan:
             ylim = [self.chans[-1],self.chans[0]]
         else:
-            ylim = [self.mds[-1],self.mds[0]]
+            ylim = [self.daxis[-1],self.daxis[0]]
         if use_timestamp:
             edtime = self.start_time + timedelta(seconds=self.taxis[-1])
             bgtime = self.start_time + timedelta(seconds=self.taxis[0])
@@ -273,10 +275,14 @@ class Data2D():
         extent = self.get_extent(ischan=ischan, timescale=timescale, use_timestamp=use_timestamp)
         img = ax.imshow(self.data[::downsample[0], ::downsample[1]],
                 cmap=cmap, aspect='auto', extent=extent)
+        
         if use_timestamp:
-            ax.xaxis_date()
+            formatter = mdates.DateFormatter('%m-%d %H:%M')
+            ax.xaxis.set_major_formatter(formatter)
             ax.xaxis.set_major_locator(MaxNLocator(xtickN))
             ax.tick_params(axis='x', labelrotation=xaxis_rotation)
+            ax.xaxis_date()
+
         return img        
     
     def plot_wiggle(self,scale=1,trace_step = 1,linewidth=1):
