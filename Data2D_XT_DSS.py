@@ -114,10 +114,12 @@ class Data2D():
             self.data = self.data[ind,:]
             try:
                 self.daxis =self.daxis[ind]
+                self.mds =self.mds[ind]
             except: 
                 pass
             try:
                 self.chans =self.chans[ind]
+                self.mds =self.mds[ind]
             except: 
                 pass
     
