@@ -100,10 +100,12 @@ class Data2D():
             out_data.data = out_data.data[ind,:]
             try:
                 out_data.daxis =out_data.daxis[ind]
+                out_data.mds =out_data.mds[ind]
             except: 
                 pass
             try:
                 out_data.chans =out_data.chans[ind]
+                out_data.mds =out_data.mds[ind]
             except: 
                 pass
 
