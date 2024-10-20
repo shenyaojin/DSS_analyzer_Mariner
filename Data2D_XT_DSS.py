@@ -105,6 +105,7 @@ class Data2D():
                 pass
             try:
                 out_data.chans =out_data.chans[ind]
+                out_data.mds =out_data.mds[ind]
             except: 
                 pass
 
@@ -118,6 +119,7 @@ class Data2D():
                 pass
             try:
                 self.chans =self.chans[ind]
+                self.mds =self.mds[ind]
             except: 
                 pass
     
