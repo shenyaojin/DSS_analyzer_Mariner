@@ -32,16 +32,10 @@ class Data2D():
     
     def apply_timeshift(self,ts):
         self.start_time += timedelta(hours=ts)
-    
-    # Time stamp stuff
-    def set_datetimestamp(self, timestamp): 
-        # time stamp must be a datetime array
-        timestamp = np.array(timestamp)
-        self.datetimestamp = timestamp
 
     def cal_timestamp_from_taxis(self):
-        timestamps = [self.start_time + timedelta(seconds=t) 
-            for t in self.taxis]
+        timestamps = np.array([self.start_time + timedelta(seconds=t) 
+            for t in self.taxis])
         self.timestamps = timestamps
     
     def print_timestamp(self):
@@ -71,7 +65,7 @@ class Data2D():
         if makecopy:
             out_data = copy.copy(self)
             out_data.taxis = self.taxis[ind]
-            out_data.datetimestamp = self.datetimestamp[ind]
+            out_data.timestamps = self.timestamps[ind]
             if reset_starttime: 
                 out_data.start_time += timedelta(seconds=out_data.taxis[0])
                 out_data.taxis -= out_data.taxis[0]
@@ -79,7 +73,7 @@ class Data2D():
             return out_data
         else:
             self.taxis = self.taxis[ind]
-            self.datetimestamp = self.datetimestamp[ind]
+            self.timestamps = self.timestamps[ind]
             if reset_starttime:
                 self.start_time += timedelta(seconds=self.taxis[0])
                 self.taxis -= self.taxis[0]
