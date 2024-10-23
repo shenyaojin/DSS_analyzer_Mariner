@@ -13,6 +13,7 @@ import copy
 import pickle
 from matplotlib.ticker import MaxNLocator
 
+# TODO: use handle to store the legend of the plot, and return the handle to the user.
 # Basically is a modified version based on my own habit. ???????
 class Data2D():
 
