@@ -134,3 +134,21 @@ class Data1D_GAUGE:
         """
         df = pd.DataFrame({'datetime': self.taxis, 'value': self.data})
         df.to_csv(filename, index=False)
+
+    def calculate_time(self):
+        """
+        Calculate the time axis in hours from the datetime axis.
+        """
+        self.time = np.array([(t - self.taxis[0]).total_seconds() / 3600 for t in self.taxis])
+
+        return self.time
+    
+    def calculate_dqdt(self):
+        """
+        Calculate the rate of change of the gauge data.
+        """
+        
+        self.calculate_time()
+        self.dqdt = np.gradient(self.data) / self.time
+
+        return self.dqdt
