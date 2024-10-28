@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import pandas as pd
 import os
+from copy import deepcopy
 
 # define an object to store the data
 class Data1D_GAUGE:
@@ -87,9 +88,7 @@ class Data1D_GAUGE:
         """
         Return a copy of the Data1D_GAUGE object.
         """
-        new_data = Data1D_GAUGE(self.filename)
-        new_data.data = self.data.copy()
-        new_data.taxis = self.taxis.copy()
+        new_data = deepcopy(self)
         return new_data
 
     def get_start_time(self):
@@ -149,6 +148,6 @@ class Data1D_GAUGE:
         """
         
         self.calculate_time()
-        self.dqdt = np.gradient(self.data) / self.time
+        self.dqdt = np.gradient(self.data)[1:] / self.time[1:]
 
         return self.dqdt
