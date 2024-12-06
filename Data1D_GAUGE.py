@@ -62,20 +62,29 @@ class Data1D_GAUGE:
         """
         self.taxis = self.taxis + shift
 
-    def plot_simple(self):
+    def plot_simple(self, use_datetime=True):
         """
         Plot the gauge data.
         """
-        plt.figure()
-        plt.plot(self.taxis, self.data)
-        # set xtick rotation
-        plt.xticks(rotation=30)
-        plt.title("Gauge data: " + self.filename)
-        plt.xlabel("Time")
-        plt.ylabel("Pressure (psi)")
-        plt.tight_layout()
-        plt.show()
-
+        if use_datetime == True:
+            plt.figure()
+            plt.plot(self.taxis, self.data)
+            # set xtick rotation
+            plt.xticks(rotation=30)
+            plt.title("Gauge data: " + self.filename)
+            plt.xlabel("Time")
+            plt.ylabel("Pressure (psi)")
+            plt.tight_layout()
+            plt.show()
+        else:
+            time_axis = self.calculate_time() * 3600
+            plt.figure()
+            plt.plot(time_axis, self.data)
+            plt.title("Gauge data: " + self.filename)
+            plt.xlabel("Time (sec)")
+            plt.ylabel("Pressure (psi)")
+            plt.tight_layout()
+            plt.show()
     def print_info(self):
         """
         Print information about the gauge data.
