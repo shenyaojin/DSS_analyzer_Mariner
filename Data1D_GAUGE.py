@@ -6,6 +6,7 @@ import os
 from copy import deepcopy
 
 # define an object to store the data
+# TODO: interpreter the data from dataframe.
 class Data1D_GAUGE:
     """
     A class to represent 1D gauge data.
