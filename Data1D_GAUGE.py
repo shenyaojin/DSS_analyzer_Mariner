@@ -6,7 +6,6 @@ import os
 from copy import deepcopy
 
 # define an object to store the data
-# TODO: interpreter the data from dataframe.
 class Data1D_GAUGE:
     """
     A class to represent 1D gauge data.
@@ -161,3 +160,17 @@ class Data1D_GAUGE:
         self.dqdt = np.gradient(self.data)[1:] / self.time[1:]
 
         return self.dqdt
+
+    def interp_data(self, taxis_new):
+        """
+        Interpolate the gauge data to a new time axis.
+
+        Parameters:
+        ----------
+        taxis_new : numpy.ndarray
+            The new time axis to interpolate the data to.
+
+        WARNING: UNDER TESTING. NOT SURE IF IT WORKS.
+        """
+        self.data = np.interp(taxis_new, self.taxis, self.data)
+        self.taxis = taxis_new
