@@ -161,16 +161,19 @@ class Data1D_GAUGE:
 
         return self.dqdt
 
-    def interp_data(self, taxis_new):
+    def get_value_by_time(self, time):
         """
-        Interpolate the gauge data to a new time axis.
+        Get the gauge data value at a specific time.
 
         Parameters:
         ----------
-        taxis_new : numpy.ndarray
-            The new time axis to interpolate the data to.
+        time : float
+            The time at which to get the data value.
 
-        WARNING: UNDER TESTING. NOT SURE IF IT WORKS.
+        Note: If you find there's a performance issue, you should crop the data first.
         """
-        self.data = np.interp(taxis_new, self.taxis, self.data)
-        self.taxis = taxis_new
+        taxis_sec = self.calculate_time() * 3600
+        # Interpolate the data
+        value = np.interp(time, taxis_sec, self.data)
+
+        return value
