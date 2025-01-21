@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime,timedelta
-from scipy.signal import medfilt2d,tukey
+from scipy.signal import medfilt2d, tukey
 import matplotlib.dates as mdates
 from dateutil.parser import parse
 from copy import copy
@@ -14,7 +14,7 @@ import pickle
 from matplotlib.ticker import MaxNLocator
 
 # TODO: use handle to store the legend of the plot, and return the handle to the user.
-# Basically is a modified version based on my own habit. ???????
+# Basically is a modified version based on my own habit.
 class Data2D():
 
     def __init__(self):
@@ -25,6 +25,7 @@ class Data2D():
         self.daxis = []  # fiber physical distance or location
         self.mds = []  # fiber physical distance or location. It is the original data from the fiber, and try not to change it.
         self.history = []
+        self.timestamps = None
 
     def set_data(self,data):
         self.data = data
