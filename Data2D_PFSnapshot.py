@@ -10,3 +10,5 @@ class Data2D_PFSnapshot:
         self.daxis = None
         self.start_time = None
         self.history = None
+
+    def load_snapshot
