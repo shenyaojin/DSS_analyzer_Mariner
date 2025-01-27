@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime,timedelta
-from scipy.signal import medfilt2d, tukey
+from scipy.signal import medfilt2d
+from scipy.signal.windows import tukey
 import matplotlib.dates as mdates
 from dateutil.parser import parse
 from copy import copy
