@@ -21,7 +21,11 @@ class Data2D_PFSnapshot:
             self.taxis = kwargs['taxis']
             self.daxis = kwargs['daxis']
         elif 'file' in kwargs:
-            self.data = np.load(kwargs['file'])
+            tmp_datafile = np.load(kwargs['file'])
+            self.data = tmp_datafile['data']
+            self.taxis = tmp_datafile['taxis']
+            self.daxis = tmp_datafile['daxis']
         else:
             print('No data is provided.')
             return
+
