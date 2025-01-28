@@ -21,7 +21,7 @@ class Data1D_GAUGE:
     """
 
     # constructor
-    def __init__(self, filename):
+    def __init__(self, filename=None, data=None, taxis=None):
         """
         Initialize the Data1D_GAUGE object by loading data from my npz file.
 
