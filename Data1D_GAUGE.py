@@ -30,11 +30,19 @@ class Data1D_GAUGE:
         filename : str
             The path to the file containing the data.
         """
-        file_name = os.path.basename(filename)
-        self.filename = file_name
-        data_structure = np.load(filename, allow_pickle=True)
-        self.data = data_structure['value']
-        self.taxis = data_structure['datetime']
+        if filename is None and data is not None and taxis is not None:
+            # set the PG frame with the data
+            self.data = data
+            self.taxis = taxis
+        elif filename is None and (data is None or taxis is None):
+            print("No data is provided.")
+            return
+        else:
+            file_name = os.path.basename(filename)
+            self.filename = file_name
+            data_structure = np.load(filename, allow_pickle=True)
+            self.data = data_structure['value']
+            self.taxis = data_structure['datetime']
 
     def crop(self, start, end):
         """
